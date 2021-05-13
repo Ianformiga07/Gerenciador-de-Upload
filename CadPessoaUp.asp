@@ -3,17 +3,18 @@
 <% 
 IF REQUEST("OPERACAO") = 1 THEN 'CADASTRAR
 	call abreConexao
- 		sql="INSERT INTO GU_CadPessoaUp(CPF, Nome, CodPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"' , '"&request.form("programas")&"' , 1)"
+ 		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1)"
 	conn.execute(sql) 
 	response.Redirect("CadPessoaUp.asp")
 	call fechaConexao 
 ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
 	call abreConexao
-	sql = "SELECT CPF, Nome, CodPrograma, status FROM GU_CadPessoaUp WHERE CPF = '"&replace(replace(request("CpfVisualizar"),".",""),"-","")&"'"
+	sql = "SELECT CPF, Nome, idPerfil, CodPrograma, status FROM GU_CadPessoasUp WHERE CPF = '"&replace(replace(request("CpfVisualizar"),".",""),"-","")&"'"
 	set rs = conn.execute(sql)
 	if not rs.eof then
 	CPF = left(rs("CPF"),3)&"."&mid(rs("CPF"),4,3)&"."&mid(rs("CPF"),7,3)&"-"&right(rs("CPF"),2)
 	Nome = rs("Nome")
+	idPerfil = rs("idPerfil")
 	CodPrograma = rs("CodPrograma")
 	StatusUsuario = rs("status")
 	Existe = 1
@@ -21,7 +22,7 @@ ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
 	call fechaConexao
 ELSEIF REQUEST("Operacao") = 3 THEN 'ALTERAR
 	call abreConexao
-	sql = "UPDATE GU_CadPessoaUp SET Nome = '"&request.Form("txtNome")&"', CodPrograma = '"&request.Form("programas")&"', status = '"&request.Form("status")&"' WHERE CPF = '"&replace(replace(replace(request.form("txtCPF"),".",""),".",""),"-","")&"'"
+	sql = "UPDATE GU_CadPessoasUp SET Nome = '"&request.Form("txtNome")&"', idPerfil = '"&request.form("perfil")&"', CodPrograma = '"&request.Form("programas")&"', status = '"&request.Form("status")&"' WHERE CPF = '"&replace(replace(replace(request.form("txtCPF"),".",""),".",""),"-","")&"'"
 	RESPONSE.WRITE sql
 	conn.execute(sql)
 	call fechaConexao
@@ -97,7 +98,24 @@ function novo()
 <p><label>Nome Completo: </label><br />
 <input type="text" id="txtNome" name="txtNome" size="60" value="<%=Nome%>"/>
 </p>
-<p>Programas: <br />
+<p>Perfil: <br />
+<% 
+call abreConexao 
+ sql="SELECT idPerfil, Perfil FROM GU_Perfil order by Perfil"
+set rs=conn.execute(sql) 
+%>
+<select name="perfil" id="perfil">
+<option value="">Selecionar</option>
+<%do while not rs.eof%>
+<option value="<%=rs("idPerfil")%>" <%if rs("idPerfil") = CodPrograma then%>selected<%end if%>><%=rs("Perfil")%>
+</option>
+<% rs.movenext 
+			loop 
+call fechaConexao
+%>
+</select>
+</p>
+<p>Pastas: <br />
 <% 
 call abreConexao 
  sql="SELECT id, Programas FROM GU_Programas order by Programas"
@@ -130,7 +148,7 @@ call fechaConexao
 </body>
 <%
    call abreConexao
-   sql = "SELECT GU_CadPessoaUp.CPF, GU_CadPessoaUp.Nome, GU_Programas.Programas, GU_CadPessoaUp.status AS statusUsuario FROM GU_CadPessoaUp INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoaUp.CodPrograma ORDER BY Nome;"
+   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Programas.Programas, GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
    set rs = conn.execute(sql)
 %>
 
