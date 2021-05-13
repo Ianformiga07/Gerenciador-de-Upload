@@ -50,10 +50,11 @@ function cadastrar(){
 <input type="text" name="txtDescricao" id="txtDescricao" size="80"/>
 </p>
 <p>
-<input type="file" name="upload" accept="application/pdf"><br><br>
+<input type="file" name="upload" accept="application/pdf" ><br><br>
 </p>
 <input type="submit" name="btnCadastrar" value="Cadastrar" onclick="return cadastrar();"/>
 </form>
+
 </body>
 <%
    call abreConexao
@@ -69,12 +70,14 @@ function cadastrar(){
   <th>Titulo</th>
   <th>Descrição</th>
   <th>Arquivo</th>
+  <th>Ações</th>
   </tr>
   <%do while not rs.eof%>
   <tr>
   <td align="center"><%=rs("titulo")%></td>
   <td align="center"><%=rs("Descricao")%></td>
-  <td align="center"><a href="#" ><%=rs("Arquivo")%></a></td>
+  <td align="center"><%=rs("Arquivo")%></td>
+  <td align="center"><a href="#" onclick=""><img src="Imagens\download.png" width="30"/></a></td>
   </tr>
   <%
      rs.movenext
