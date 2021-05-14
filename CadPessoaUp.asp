@@ -93,7 +93,7 @@ function novo()
 <input type="hidden" name="Operacao" id="Operacao">
 <input type="hidden" name="CpfVisualizar" id="CpfVisualizar">
 <p><label>CPF: </label><br />
-<input type="text" onKeyPress="MascaraCPF(txtCPF)"  name="txtCPF" id="txtcpf" value="<%IF Existe = 1 THEN Response.Write(CPF) ELSE Response.Write(Request("txtCPF")) END IF%>" maxlength="14" onblur="MascaraCPF(txtCPF);verificar_cadastro();"<%IF REQUEST ("Operacao") = 2 AND Existe = 1 THEN%> readonly="readonly"<%END IF%>/>
+<input type="text" onKeyPress="MascaraCPF(txtCPF)"  name="txtCPF" id="txtcpf" value="<%IF Existe = 1 THEN Response.Write(CPF) ELSE Response.Write(Request("txtCPF")) END IF%>" maxlength="14" onBlur="MascaraCPF(txtCPF);verificar_cadastro();"<%IF REQUEST ("Operacao") = 2 AND Existe = 1 THEN%> readonly<%END IF%>/>
 </p>
 <p><label>Nome Completo: </label><br />
 <input type="text" id="txtNome" name="txtNome" size="60" value="<%=Nome%>"/>
@@ -173,7 +173,7 @@ call fechaConexao
   <%ELSE%>
   <font color="#FF0000"> DESATIVO </font>
   <%END IF%></td>
-  <td align="center"><a href="#" onclick="visualizar(<%=rs("CPF")%>)"><img src="Imagens\editar.png" width="30"/></a></td>
+  <td align="center"><a href="#" onClick="visualizar(<%=rs("CPF")%>)"><img src="Imagens\editar.png" width="30"/></a></td>
   </tr>
   <%
      rs.movenext
