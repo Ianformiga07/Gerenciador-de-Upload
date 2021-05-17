@@ -18,6 +18,7 @@ call fechaConexao
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="pt-br">
 <title>Cadastro de Upload</title>
 <script type="text/javascript">
 function validar() {
@@ -63,7 +64,7 @@ function cadastrar(){
 </body>
 <%
    call abreConexao
-   sql = "SELECT titulo, Descricao, cpf, Arquivo, FORMAT (getdate(), 'dd/MM/yyyy ') as data FROM GU_Arquivos ORDER BY titulo;"
+   sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF ORDER BY titulo;"
    set rs = conn.execute(sql)
 %>
 
@@ -74,7 +75,7 @@ function cadastrar(){
   <tr>
   <th>Titulo</th>
   <th>Descrição</th>
-  <th>CPF</th>
+  <th>Nome Completo</th>
   <th>Arquivo</th>
   <th>Data</th>
   <th>Ações</th>
@@ -83,8 +84,8 @@ function cadastrar(){
   <tr>
   <td align="center"><%=rs("titulo")%></td>
   <td align="center"><%=rs("Descricao")%></td>
-  <td align="center"><%=rs("cpf")%></td>
-  <td align="center"><%=mid(rs("Arquivo"),10,100)&""%></td>
+  <td align="center"><%=rs("Nome")%></td>
+  <td align="center"><a href="<%=rs("Arquivo")%>"><%=mid(rs("Arquivo"),10,100)&""%></a></td>
   <td align="center"><%=rs("data")%></td>
   <td align="center"><a href="<%=rs("Arquivo")%>" download><img src="Imagens\download.png" width="30"/></a></td>
   </tr>

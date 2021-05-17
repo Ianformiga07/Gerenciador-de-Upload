@@ -2,6 +2,7 @@
 <!--#include file="upload.lib.asp"-->
 <!--#include file ="lib/Conexao.asp"-->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="pt-br">
 <%
 
 Response.Charset = "ISO-8859-1"
