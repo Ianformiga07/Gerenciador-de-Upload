@@ -3,10 +3,12 @@
 <% 
 IF REQUEST("OPERACAO") = 1 THEN 'CADASTRAR
 	call abreConexao
- 		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1)"
+ 		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, CodTipoPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , '"&request.form("tipoProgramas")&"' , 1)"
 	conn.execute(sql) 
-	response.Redirect("CadPessoaUp.asp")
+	Session("CPF_Usu") = replace(replace(request.form("txtCPF"),".",""),"-","")
+	response.Redirect("CadUpload.asp?cpf="&Session("CPF_Usu")&"")
 	call fechaConexao 
+	
 ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
 	call abreConexao
 	sql = "SELECT CPF, Nome, idPerfil, CodPrograma, status FROM GU_CadPessoasUp WHERE CPF = '"&replace(replace(request("CpfVisualizar"),".",""),"-","")&"'"
@@ -132,6 +134,23 @@ call fechaConexao
 %>
 </select>
 </p>
+<p>Pastas: <br />
+<% 
+call abreConexao 
+ sql="SELECT id, TipoProgramas FROM GU_TipoProgramas order by TipoProgramas"
+set rs=conn.execute(sql) 
+%>
+<select name="TipoProgramas" id="TipoProgramas">
+<option value="">Selecionar</option>
+<%do while not rs.eof%>
+<option value="<%=rs("id")%>" <%if rs("id") = CodtipoPrograma then%>selected<%end if%>><%=rs("TipoProgramas")%>
+</option>
+<% rs.movenext 
+			loop 
+call fechaConexao
+%>
+</select>
+</p>
 <%IF EXISTE = 1 THEN%>
 <p>Status: <br />
 <select name="status" id="status">
@@ -148,7 +167,7 @@ call fechaConexao
 </body>
 <%
    call abreConexao
-   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Programas.Programas, GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
+   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, GU_TipoProgramas.TipoProgramas ,GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma INNER JOIN GU_TipoProgramas ON GU_TipoProgramas.id = GU_CadPessoasUp.CodTipoPrograma ORDER BY Nome;"
    set rs = conn.execute(sql)
 %>
 
@@ -159,7 +178,9 @@ call fechaConexao
   <tr>
   <th>CPF</th>
   <th>Nome Completo</th>
-  <th>Programa</th>
+  <th>Perfil</th>
+  <th>Pastas</th>
+  <th>Programas</th>
   <th>Status</th>
   <th>Operação</th>
   </tr>
@@ -167,7 +188,9 @@ call fechaConexao
   <tr>
   <td align="center"><%=rs("CPF")%></td>
   <td align="center"><%=rs("Nome")%></td>
+  <td align="center"><%=rs("Perfil")%></td>
   <td align="center"><%=rs("Programas")%></td>
+  <td align="center"><%=rs("TipoProgramas")%></td>
   <td align="center"><%IF  rs("statusUsuario") = TRUE THEN%>
   <font color="#009933"> ATIVO </font>
   <%ELSE%>

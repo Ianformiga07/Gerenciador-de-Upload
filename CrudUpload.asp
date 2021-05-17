@@ -1,7 +1,7 @@
 <%@LANGUAGE="VBSCRIPT" CODEPAGE="65001"%>
 <!--#include file="upload.lib.asp"-->
 <!--#include file ="lib/Conexao.asp"-->
-
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <%
 
 Response.Charset = "ISO-8859-1"
@@ -20,6 +20,8 @@ if Form.State = 0 Then
 				
             elseIf Key = "txtDescricao" Then
                 desc = Form.Texts.Item(Key)
+			elseIf Key = "cpf" Then
+                cpf = Form.Texts.Item(Key)
             else
                 end if
 
@@ -32,8 +34,8 @@ if Form.State = 0 Then
             on error resume next
 			call abreConexao
 			
-            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, Arquivo) VALUES ('"&titulo&"','"&desc&"','.\upload\"&Field.FileName&"')" 
-			
+            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, cpf, Arquivo) VALUES ('"&titulo&"','"&desc&"', '"&cpf&"','.\upload\"&Field.FileName&"')" 
+
             Set rs = conn.Execute(sql)
                 response.redirect("CadUpload.asp")
             rs.Close
