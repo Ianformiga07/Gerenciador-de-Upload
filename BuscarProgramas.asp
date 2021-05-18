@@ -5,13 +5,13 @@
 
 IF REQUEST("Operacao") = 2 THEN
 call abreConexao
-sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma WHERE CodPrograma = '"&request.form("programas")&"'"
+sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data, GU_Programas.id, GU_Programas.Programas FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma WHERE GU_Programas.id ='"&request.form("programas")&"'"
 
 set rs = conn.execute(sql)
 	if not rs.eof then
-	id = rs("CodPrograma")
+	CodPrograma = rs("id")
 	end if
-call fechaConexao
+
 END IF
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -23,7 +23,7 @@ END IF
 function visualizar()
 {
 	if(document.frmBusca.programas.value != ""){
-		
+	
 	document.frmBusca.Operacao.value = 2;
 	document.frmBusca.action = "BuscarProgramas.asp";
 	document.frmBusca.submit();
@@ -41,27 +41,24 @@ function visualizar()
 <% 
 call abreConexao 
  sql = "SELECT id, Programas FROM GU_Programas order by Programas"
-set rs = conn.execute(sql) 
+set rs1 = conn.execute(sql) 
 %>
 <select name="programas" id="programas">
 <option value="">Selecionar</option>
-<%do while not rs.eof%>
-<option value="<%=rs("id")%>" <%if rs("id") = CodPrograma then%>selected<%end if%>><%=rs("Programas")%>
+<%do while not rs1.eof%>
+<option value="<%=rs1("id")%>"<%IF rs1("id") = CodPrograma THEN%>selected<%END IF%>><%=rs1("Programas")%>
 </option>
-<% rs.movenext 
+<% rs1.movenext 
 			loop 
 call fechaConexao
 %>
 </select>
 </p>
 
-<input type="submit" name="btnCadastrar" value="Buscar" onclick="visualizar();"/>
+<input type="submit" name="btnCadastrar" value="Buscar" onclick="return visualizar();"/>
 </form>
 </body>
-
-
-<%if request("Operacao") =  2 then%>
-
+<%IF REQUEST("Operacao") = 2 THEN%>
 <table width="650" border="1" align="center">
   <%if rs.eof then%>
   <tr><td>Não Existe Nenhum Registro na base de Dados!</td></tr>
@@ -90,5 +87,6 @@ call fechaConexao
   <%end if%>
 </table>
 <%call fechaConexao%>
+<%conn.nothing%>
 <%END IF%>
 </html>

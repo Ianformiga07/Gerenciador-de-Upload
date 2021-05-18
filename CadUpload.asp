@@ -62,6 +62,7 @@ function cadastrar(){
 </form>
 
 </body>
+
 <%
    call abreConexao
    sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF ORDER BY titulo;"
@@ -87,7 +88,7 @@ function cadastrar(){
   <td align="center"><%=rs("Nome")%></td>
   <td align="center"><a href="<%=rs("Arquivo")%>"><%=mid(rs("Arquivo"),10,100)&""%></a></td>
   <td align="center"><%=rs("data")%></td>
-  <td align="center"><a href="<%=rs("Arquivo")%>" download><img src="Imagens\download.png" width="30"/></a></td>
+  <td align="center"><a href="<%=rs("Arquivo")%>"><img src="Imagens\lixeira.png" width="30"/></a></td>
   </tr>
   <%
      rs.movenext
@@ -96,4 +97,5 @@ function cadastrar(){
   <%end if%>
 </table>
 <%call fechaConexao%>
+
 </html>
