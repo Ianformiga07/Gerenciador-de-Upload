@@ -6,13 +6,13 @@
 <%
 
 Response.Charset = "ISO-8859-1"
-
 op = request("op") 
 Dim Form : Set Form = New ASPForm
 Server.ScriptTimeout = 1440 'Limite de 24 minutos de execu��o de c�digo, o upload deve acontecer dentro deste tempo ou ent�o ocorre erro de limite de tempo.
 Const MaxFileSize = 10240000 'Bytes. Aqui est� configurado o limite de 100 MB por upload (inclui todos os tamanhos de arquivos e conte�dos dos formul�rios).
 if op = 1 then
-	
+	id = request("id")
+    desativar(id)
 if Form.State = 0 Then
 			
         For each Key in Form.Texts.Keys
@@ -35,7 +35,7 @@ if Form.State = 0 Then
             on error resume next
 			call abreConexao
 			
-            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, cpf, Arquivo) VALUES ('"&titulo&"','"&desc&"', '"&cpf&"','.\upload\"&Field.FileName&"')" 
+            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, cpf, Arquivo, status) VALUES ('"&titulo&"','"&desc&"', '"&cpf&"','.\upload\"&Field.FileName&"', 1)" 
 
             Set rs = conn.Execute(sql)
                 response.redirect("CadUpload.asp")
@@ -45,4 +45,18 @@ if Form.State = 0 Then
 		call fechaConexao
 End If
 end if
+function desativar(id)
+    on error resume next
+	call abreConexao
+    sql = "UPDATE GU_arquivos SET status = 0 WHERE id ='"&id&"'"
+    Set rs = conn.Execute(sql)
+    %>
+        <script>
+        window.location.assign('CadUpload.asp');
+        </script>
+    <%
+    rs.close
+    Set rs = Nothing
+	call fechaConexao
+end function 
 %>

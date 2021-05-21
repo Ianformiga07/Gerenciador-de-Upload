@@ -20,6 +20,9 @@ ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
 	CodPrograma = rs("CodPrograma")
 	StatusUsuario = rs("status")
 	Existe = 1
+	else
+	CPF = request.form("CpfVisualizar")
+	Existe = 0 
 	end if
 	call fechaConexao
 ELSEIF REQUEST("Operacao") = 3 THEN 'ALTERAR
@@ -89,6 +92,12 @@ function novo()
 	document.frmCadastro.action = "CadPessoaUp.asp";
 	document.frmCadastro.submit();
 }
+function upload(cpf)
+{
+	document.frmCadastro.Operacao.value = 5;
+	document.frmCadastro.action = "CadUpload.asp?cpf="+cpf;
+	document.frmCadastro.submit();
+}
 </script>
  </head>
 <body>
@@ -96,7 +105,7 @@ function novo()
 <input type="hidden" name="Operacao" id="Operacao">
 <input type="hidden" name="CpfVisualizar" id="CpfVisualizar">
 <p><label>CPF: </label><br />
-<input type="text" onKeyPress="MascaraCPF(txtCPF)"  name="txtCPF" id="txtcpf" value="<%IF Existe = 1 THEN Response.Write(CPF) ELSE Response.Write(Request("txtCPF")) END IF%>" maxlength="14" onBlur="MascaraCPF(txtCPF);verificar_cadastro();"<%IF REQUEST ("Operacao") = 2 AND Existe = 1 THEN%> readonly<%END IF%>/>
+<input type="text" onKeyPress="MascaraCPF(txtCPF)"  name="txtCPF" id="txtCPF" value="<%IF Existe = 1 THEN Response.Write(CPF) ELSE Response.Write(Request("txtCPF")) END IF%>" maxlength="14" onBlur="MascaraCPF(txtCPF);verificar_cadastro();"<%IF REQUEST ("Operacao") = 2 AND Existe = 1 THEN%> readonly<%END IF%>/>
 </p>
 <p><label>Nome Completo: </label><br />
 <input type="text" id="txtNome" name="txtNome" size="60" value="<%=Nome%>"/>
@@ -145,9 +154,11 @@ call fechaConexao
 <input type="submit" name="btnCadastro" value="<%IF Existe = 1 THEN%>Alterar<%ELSE%>Cadastrar<%END IF%>" onClick="return <%IF Existe = 1 THEN%>alterar();<%ELSE%>cadastrar();<%END IF%>" />
 <%IF Existe = 1 THEN%>
 <input type="button" name="btnNovo" value="Novo" onClick="return novo();" />
-<%END IF%>
+
+<%end if%>
 </form>
 </body>
+<%IF REQUEST("Operacao") = 2 and Existe = 1 THEN%>
 <%
    call abreConexao
    sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
@@ -186,5 +197,5 @@ call fechaConexao
   <%end if%>
 </table>
 <%call fechaConexao%>
-
+<%end if%>
 </html>
