@@ -5,11 +5,12 @@
 
 IF REQUEST("Operacao") = 2 THEN
 call abreConexao
-sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data, GU_Programas.id, GU_Programas.Programas FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma WHERE GU_Programas.id ='"&request.form("programas")&"'"
+sql = "SELECT GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data, GU_Programas.id, GU_Programas.Programas FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma WHERE GU_Programas.id ='"&request.form("programas")&"' AND GU_Arquivos.status = 1"
 
 set rs = conn.execute(sql)
 	if not rs.eof then
 	CodPrograma = rs("id")
+	existe = 1
 	end if
 
 END IF
@@ -58,7 +59,7 @@ call fechaConexao
 <input type="submit" name="btnCadastrar" value="Buscar" onclick="return visualizar();"/>
 </form>
 </body>
-<%IF REQUEST("Operacao") = 2 THEN%>
+<%IF REQUEST("Operacao") = 2 and Existe = 1 THEN%>
 <table width="650" border="1" align="center">
   <%if rs.eof then%>
   <tr><td>Não Existe Nenhum Registro na base de Dados!</td></tr>
@@ -87,6 +88,5 @@ call fechaConexao
   <%end if%>
 </table>
 <%call fechaConexao%>
-<%conn.nothing%>
 <%END IF%>
 </html>

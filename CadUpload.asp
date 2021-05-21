@@ -16,7 +16,13 @@ call fechaConexao
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="pt-br">
 <title>Cadastro de Upload</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script type="text/javascript">
+
+var url_string = window.location.href;
+var url = new URL(url_string);
+var resp = url.searchParams.get("resp");
+
 function validar() {
 	if(document.frmUpload.txtTitulo.value == ""){
    		alert("Obrigatorio digitar o CPF!");
@@ -39,7 +45,20 @@ function cadastrar(){
 }
 function desativar(id)
 {
-	window.location="CrudUpload.asp?id="+id+"&op=1"
+	  Swal.fire({
+  title: 'Deseja continuar?',
+    text: "O Arquivo será desativado e não será mais listado no sistema!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',    
+    cancelButtonText: 'Cancelar',
+    confirmButtonText: 'Sim, prosseguir!'
+  }).then((result) => {
+    if (result.value) {
+       window.location="CrudUpload.asp?id="+id+"&op=1"
+    }
+  })
 }
 
 </script>

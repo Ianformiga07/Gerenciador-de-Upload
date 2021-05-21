@@ -1,6 +1,7 @@
 <%@LANGUAGE="VBSCRIPT" CODEPAGE="65001" %>
 <!--#include file ="lib/Conexao.asp"-->
 <% 
+if 
 IF REQUEST("OPERACAO") = 1 THEN 'CADASTRAR
 	call abreConexao
  		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1)"
@@ -33,6 +34,7 @@ ELSEIF REQUEST("Operacao") = 3 THEN 'ALTERAR
 	call fechaConexao
 	response.Redirect("CadPessoaUp.asp")
 END IF
+
 %>
 <html>
 <head>
@@ -101,7 +103,7 @@ function upload(cpf)
 </script>
  </head>
 <body>
-<form id="frmCadastro" name="frmCadastro" method="post">
+<form id="frmCadastro" name="frmCadastro" method="post" onSubmit="return validar();">
 <input type="hidden" name="Operacao" id="Operacao">
 <input type="hidden" name="CpfVisualizar" id="CpfVisualizar">
 <p><label>CPF: </label><br />
@@ -119,7 +121,7 @@ set rs=conn.execute(sql)
 <select name="perfil" id="perfil">
 <option value="">Selecionar</option>
 <%do while not rs.eof%>
-<option value="<%=rs("idPerfil")%>" <%if rs("idPerfil") = CodPrograma then%>selected<%end if%>><%=rs("Perfil")%>
+<option value="<%=rs("idPerfil")%>" <%if rs("idPerfil") = idPerfil then%>selected<%end if%>><%=rs("Perfil")%>
 </option>
 <% rs.movenext 
 			loop 
@@ -158,7 +160,7 @@ call fechaConexao
 <%end if%>
 </form>
 </body>
-<%IF REQUEST("Operacao") = 2 and Existe = 1 THEN%>
+<%if REQUEST("Operacao") = 1 then%>
 <%
    call abreConexao
    sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
