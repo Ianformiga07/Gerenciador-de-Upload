@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="pt-br">
 <%
-
 Response.Charset = "ISO-8859-1"
 op = request("op") 
 Dim Form : Set Form = New ASPForm
@@ -16,9 +15,8 @@ if op = 1 then
 if Form.State = 0 Then
 			
         For each Key in Form.Texts.Keys
-            if Key = "txtTitulo" then   
+            if Key = "txtTitulo" then 
                 titulo = Form.Texts.Item(Key)
-				
             elseIf Key = "txtDescricao" Then
                 desc = Form.Texts.Item(Key)
 			elseIf Key = "cpf" Then
@@ -35,8 +33,7 @@ if Form.State = 0 Then
             on error resume next
 			call abreConexao
 			
-            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, cpf, Arquivo, status) VALUES ('"&titulo&"','"&desc&"', '"&cpf&"','.\upload\"&Field.FileName&"', 1)" 
-
+            sql = "INSERT INTO GU_Arquivos (Titulo, Descricao, cpf, Arquivo, status, DataArquivo) VALUES ('"&titulo&"','"&desc&"', '"&cpf&"','.\upload\"&Field.FileName&"', 1, getdate())" 
             Set rs = conn.Execute(sql)
                 response.redirect("CadUpload.asp")
             rs.Close

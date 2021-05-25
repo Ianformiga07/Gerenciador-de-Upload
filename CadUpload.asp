@@ -2,7 +2,6 @@
 <!--#include file ="lib/Conexao.asp"-->
 <!--#include file="upload.lib.asp"-->
 <%
-
 call abreConexao
  sql =  "SELECT * FROM GU_Arquivos WHERE id = '"&request("id")&"'"
   Set rs = conn.Execute(sql)

@@ -1,10 +1,10 @@
 <%@LANGUAGE="VBSCRIPT" CODEPAGE="65001" %>
 <!--#include file ="lib/Conexao.asp"-->
 <% 
-if 
+
 IF REQUEST("OPERACAO") = 1 THEN 'CADASTRAR
 	call abreConexao
- 		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1)"
+ 		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status, DataCadUsuario, cpfCad) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1 , getdate(),'"&request.form("cpf")&"')"
 	conn.execute(sql) 
 	Session("CPF_Usu") = replace(replace(request.form("txtCPF"),".",""),"-","")
 	response.Redirect("CadPessoaUp.asp?cpf="&Session("CPF_Usu")&"")
@@ -91,6 +91,7 @@ function alterar()
 function novo()
 {
 	document.frmCadastro.Operacao.value = 0;
+	document.frmCadastro.txtCPF.value = '';
 	document.frmCadastro.action = "CadPessoaUp.asp";
 	document.frmCadastro.submit();
 }
@@ -100,6 +101,7 @@ function upload(cpf)
 	document.frmCadastro.action = "CadUpload.asp?cpf="+cpf;
 	document.frmCadastro.submit();
 }
+
 </script>
  </head>
 <body>
@@ -132,13 +134,13 @@ call fechaConexao
 <p>Pastas: <br />
 <% 
 call abreConexao 
- sql="SELECT id, Programas FROM GU_Programas order by Programas"
+ sql="SELECT * FROM GU_Programas WHERE status = 1 order by Sigla"
 set rs=conn.execute(sql) 
 %>
 <select name="programas" id="programas">
 <option value="">Selecionar</option>
 <%do while not rs.eof%>
-<option value="<%=rs("id")%>" <%if rs("id") = CodPrograma then%>selected<%end if%>><%=rs("Programas")%>
+<option value="<%=rs("id")%>" <%if rs("id") = CodPrograma then%>selected<%end if%>><%=rs("Sigla")%>
 </option>
 <% rs.movenext 
 			loop 
@@ -153,6 +155,9 @@ call fechaConexao
 </select>
 <%END IF%>
 </p>
+</p>
+<input type="text" name="cpf" id="cpf" value="<%=Session("CPF_Usu")%>" hidden/>
+<p>
 <input type="submit" name="btnCadastro" value="<%IF Existe = 1 THEN%>Alterar<%ELSE%>Cadastrar<%END IF%>" onClick="return <%IF Existe = 1 THEN%>alterar();<%ELSE%>cadastrar();<%END IF%>" />
 <%IF Existe = 1 THEN%>
 <input type="button" name="btnNovo" value="Novo" onClick="return novo();" />
@@ -160,10 +165,10 @@ call fechaConexao
 <%end if%>
 </form>
 </body>
-<%if REQUEST("Operacao") = 1 then%>
+
 <%
    call abreConexao
-   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
+   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, FORMAT (getdate(), 'dd/MM/yyyy ') as DataCadUsuario,GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
    set rs = conn.execute(sql)
 %>
 
@@ -176,6 +181,7 @@ call fechaConexao
   <th>Nome Completo</th>
   <th>Perfil</th>
   <th>Pastas</th>
+  <th>Data</th>
   <th>Status</th>
   <th>Operação</th>
   </tr>
@@ -185,6 +191,7 @@ call fechaConexao
   <td align="center"><%=rs("Nome")%></td>
   <td align="center"><%=rs("Perfil")%></td>
   <td align="center"><%=rs("Programas")%></td>
+  <td align="center"><%=rs("DataCadUsuario")%></td>
   <td align="center"><%IF  rs("statusUsuario") = TRUE THEN%>
   <font color="#009933"> ATIVO </font>
   <%ELSE%>
@@ -199,5 +206,5 @@ call fechaConexao
   <%end if%>
 </table>
 <%call fechaConexao%>
-<%end if%>
+
 </html>
