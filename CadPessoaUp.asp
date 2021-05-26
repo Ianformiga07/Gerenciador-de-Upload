@@ -1,13 +1,17 @@
 <%@LANGUAGE="VBSCRIPT" CODEPAGE="65001" %>
 <!--#include file ="lib/Conexao.asp"-->
 <% 
-
+dim resposta
+resposta = 0
 IF REQUEST("OPERACAO") = 1 THEN 'CADASTRAR
 	call abreConexao
  		sql="INSERT INTO GU_CadPessoasUp(CPF, Nome, idPerfil, CodPrograma, status, DataCadUsuario, cpfCad) VALUES('"&replace(replace(replace(request.form("txtCPF"),".",""),".", ""),"-","")&"', '"&request.form("txtNome")&"','"&request.form("perfil")&"', '"&request.form("programas")&"' , 1 , getdate(),'"&request.form("cpf")&"')"
 	conn.execute(sql) 
+	resposta = 1
 	Session("CPF_Usu") = replace(replace(request.form("txtCPF"),".",""),"-","")
-	response.Redirect("CadPessoaUp.asp?cpf="&Session("CPF_Usu")&"")
+	session("idPerfil") = request.form("perfil")
+	session("CodPrograma") = request.form("programas")
+	'response.Redirect("CadPessoaUp.asp")
 	call fechaConexao 
 	
 ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
@@ -29,10 +33,10 @@ ELSEIF REQUEST("Operacao") = 2 THEN 'VISUALIZAR
 ELSEIF REQUEST("Operacao") = 3 THEN 'ALTERAR
 	call abreConexao
 	sql = "UPDATE GU_CadPessoasUp SET Nome = '"&request.Form("txtNome")&"', idPerfil = '"&request.form("perfil")&"', CodPrograma = '"&request.Form("programas")&"', status = '"&request.Form("status")&"' WHERE CPF = '"&replace(replace(replace(request.form("txtCPF"),".",""),".",""),"-","")&"'"
-	RESPONSE.WRITE sql
 	conn.execute(sql)
+	resposta = 2
 	call fechaConexao
-	response.Redirect("CadPessoaUp.asp")
+	'response.Redirect("CadPessoaUp.asp")
 END IF
 
 %>
@@ -41,6 +45,7 @@ END IF
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="pt-br">
 <title>Cadastro</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
 <script src="javascript/Mascara.js"></script>
 <script type="text/javascript">
 function validar() {
@@ -88,6 +93,7 @@ function alterar()
 	document.frmCadastro.action = "CadPessoaUp.asp";
 	document.frmCadastro.submit();
 }
+
 function novo()
 {
 	document.frmCadastro.Operacao.value = 0;
@@ -101,10 +107,36 @@ function upload(cpf)
 	document.frmCadastro.action = "CadUpload.asp?cpf="+cpf;
 	document.frmCadastro.submit();
 }
-
+function mensagem(resp){
+if(resp == 1){
+	Swal.fire({
+      title: "Ótimo!!!",
+      text: "Usuário Cadastrado com Sucesso!",
+      icon: "success",
+      button: "Ok!",
+      });
+      return false;
+}
+else
+if(resp == 2){
+	 Swal.fire({
+      title: "Ótimo!!!",
+      text: "Usuário Alterado com Sucesso!",
+      icon: "success",
+      button: "Ok!",
+      });
+      return false;
+}
+}
 </script>
  </head>
 <body>
+<%if resposta = 1 or resposta = 2 then%>
+<script>
+  var resp = <%=resposta%>
+  mensagem(resp)
+</script>
+<%end if%>
 <form id="frmCadastro" name="frmCadastro" method="post" onSubmit="return validar();">
 <input type="hidden" name="Operacao" id="Operacao">
 <input type="hidden" name="CpfVisualizar" id="CpfVisualizar">
@@ -163,12 +195,13 @@ call fechaConexao
 <input type="button" name="btnNovo" value="Novo" onClick="return novo();" />
 
 <%end if%>
+
 </form>
 </body>
 
 <%
    call abreConexao
-   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, FORMAT (getdate(), 'dd/MM/yyyy ') as DataCadUsuario,GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
+   sql = "SELECT GU_CadPessoasUp.CPF, GU_CadPessoasUp.Nome, GU_Perfil.Perfil, GU_Programas.Programas, FORMAT (DataCadUsuario, 'dd/MM/yyyy ') as DataCadUsuario,GU_CadPessoasUp.status AS statusUsuario FROM GU_CadPessoasUp INNER JOIN GU_Perfil ON GU_Perfil.idPerfil = GU_CadPessoasUp.idPerfil INNER JOIN GU_Programas ON GU_Programas.id = GU_CadPessoasUp.CodPrograma ORDER BY Nome;"
    set rs = conn.execute(sql)
 %>
 

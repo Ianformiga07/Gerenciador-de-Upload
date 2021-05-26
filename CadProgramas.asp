@@ -7,6 +7,7 @@ IF REQUEST("Operacao") = 1 THEN
 call abreConexao
 sql = "INSERT INTO GU_Programas(Sigla, Programas, status) VALUES('"&request.form("txtSigla")&"', '"&request.form("txtNome")&"', 1)"
 conn.execute(sql)
+resposta = 1
 call fechaConexao
 ELSEIF REQUEST("Operacao") = 2 THEN
 call abreConexao
@@ -18,21 +19,23 @@ set rs = conn.execute(sql)
 	programas = rs("Programas")
 	statusPrograma = rs("status")
 	Existe = 1
+
 	end if
 call fechaConexao
 ELSEIF REQUEST("Operacao") = 3 THEN
 call abreConexao
-sql = "SELECT COUNT(*) as ExisteCad FROM GU_Programas where id = '"&request.form("id")&"' and status = 1"
+sql = "SELECT COUNT(*) as ExisteCad FROM GU_Arquivos where CodPrograma = '"&request.form("id")&"' and status = 1"
 set rs = conn.execute(sql)
-if clng(rs("ExisteCad")) = 0 then
+
+if rs("ExisteCad") = 0 then
 sql = "UPDATE GU_Programas SET Sigla = '"&request.form("txtSigla")&"', Programas = '"&request.form("txtNome")&"', status = '"&request.Form("status")&"' WHERE id = '"&request.form("id")&"'"
-response.write sql
-response.end
 conn.execute(sql)
+resposta = 2
 else
-resposta = 2 'EXISTE CADASTRO
+resposta = 3 'EXISTE CADASTRO
 end if
 call fechaConexao
+
 END IF
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -40,7 +43,10 @@ END IF
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Cadastrar Pastas</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
+<script src="javascript/Mascara.js"></script>
 <script type="text/javascript">
+
 function validar() {
 	if(document.frmProgramas.txtSigla.value == ""){
    		alert("Obrigatorio digitar a Sigla!");
@@ -62,6 +68,13 @@ function cadastrar(){
 	document.frmProgramas.action = "CadProgramas.asp";
 	document.frmProgramas.submit();
 }
+function verificar_cadastro()
+{
+	document.frmProgramas.Operacao.value = 2;
+	document.frmProgramas.idVisualizar.value = document.frmProgramas.id.value;
+	document.frmProgramas.action = "CadProgramas.asp";
+	document.frmProgramas.submit();
+}
 function visualizar(id)
 {	
 	document.frmProgramas.Operacao.value = 2;
@@ -78,9 +91,50 @@ function alterar()
 	document.frmProgramas.action = "CadProgramas.asp";
 	document.frmProgramas.submit();
 }
+
+function mensagem(resp) {
+if(resp == 1){
+	Swal.fire({
+      title: "Ótimo!!!",
+      text: "Programa Cadastrado com Sucesso!",
+      icon: "success",
+      button: "Ok!",
+      });
+      return false;
+}
+else
+if(resp == 2){
+	 Swal.fire({
+      title: "Ótimo!!!",
+      text: "Programa Alterado com Sucesso!",
+      icon: "success",
+      button: "Ok!",
+      });
+      return false;
+}
+else	
+if(resp == 3){
+     Swal.fire({
+      title: "Ops!!!",
+      text: "Já Consta arquivos Cadastrados nesta pasta!",
+      icon: "error",
+      button: "Ok!",
+      });
+      return false;
+}
+}
+
+
 </script>
 </head>
+
 <body>
+<%if resposta = 3 or resposta = 1 or resposta = 2 then%>
+<script>
+  var resp = <%=resposta%>
+  mensagem(resp)
+</script>
+<%end if%>
 <h1>Cadastro de Programas</h1>
 <form name="frmProgramas" id="frmProgramas" method="post">
 <input type="hidden" name="Operacao" id="Operacao" />
@@ -93,15 +147,15 @@ function alterar()
 <input type="text" name="txtNome" id="txtNome" value="<%=programas%>"/>
 </p>
 </select>
-
+<%IF Existe = 1 then%>
 <p>Status: <br />
 <select name="status" id="status">
 <option value="1"  <%if StatusPrograma = true then%> selected <%end if%>> Ativo </option>
 <option value="0"  <%if StatusPrograma = false then%> selected <%end if%>> Desativo </option>
 </select>
-
+<%END IF%>
 </p>
-<input type="submit" name="btnCadastrar" value="<%IF Existe = 1 THEN%>Alterar<%ELSE%>Cadastrar<%END IF%>" onClick="return <%IF Existe = 1 THEN%>alterar();<%ELSE%>cadastrar();<%END IF%>" />
+<input type="submit" name="btnCadastrar" value="<%IF Existe = 1 THEN%>Alterar<%ELSE%>Cadastrar<%END IF%>" onClick="return <%IF Existe = 1 THEN%>alterar();mensagem();<%ELSE%>cadastrar();<%END IF%>" />
 </form>
 </body>
 <%

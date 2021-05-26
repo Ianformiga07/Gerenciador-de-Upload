@@ -5,7 +5,6 @@
 call abreConexao
  sql =  "SELECT * FROM GU_Arquivos WHERE id = '"&request("id")&"'"
   Set rs = conn.Execute(sql)
-
 call fechaConexao 
 
 %>
@@ -44,8 +43,8 @@ function cadastrar(){
 }
 function desativar(id)
 {
-	  Swal.fire({
-  title: 'Deseja continuar?',
+	Swal.fire({
+    title: 'Deseja continuar?',
     text: "O Arquivo será desativado e não será mais listado no sistema!",
     icon: 'warning',
     showCancelButton: true,
@@ -67,6 +66,7 @@ function desativar(id)
 <form name="frmUpload" enctype="multipart/form-data" method="POST" action="CrudUpload.asp?op=1">
 <input type="hidden" name="Operacao" id="Operacao" />
 <input type="text" name="idArquivo" id="idArquivo" value="<%=request("id")%>" hidden/>
+
 <p>Título: <br />
 <input type="text" name="txtTitulo" id="txtTitulo" />
 </p>
@@ -74,6 +74,7 @@ function desativar(id)
 <input type="text" name="txtDescricao" id="txtDescricao" size="80"/>
 </p>
 <input type="text" name="cpf" id="cpf" value="<%=Session("CPF_Usu")%>" hidden/>
+<input type="text" name="codprograma" id="codprograma" value="<%=session("CodPrograma")%>" hidden/>
 <p>
 <input type="file" name="upload" accept="application/pdf" ><br><br>
 </p>
@@ -84,7 +85,7 @@ function desativar(id)
 
 <%
    call abreConexao
-   sql = "SELECT GU_Arquivos.id, GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (getdate(), 'dd/MM/yyyy ') as data, GU_Arquivos.status FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF WHERE GU_Arquivos.status = 1 ORDER BY titulo;"
+   sql = "SELECT GU_Arquivos.id, GU_Arquivos.Titulo, GU_Arquivos.Descricao, GU_CadPessoasUp.Nome, GU_Arquivos.Arquivo , FORMAT (dataArquivo, 'dd/MM/yyyy ') as data, GU_Arquivos.status FROM GU_CadPessoasUp INNER JOIN GU_Arquivos ON GU_Arquivos.cpf = GU_CadPessoasUp.CPF WHERE GU_Arquivos.status = 1 ORDER BY titulo;"
    set rs = conn.execute(sql)
 %>
 

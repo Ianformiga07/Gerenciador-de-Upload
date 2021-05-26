@@ -16,7 +16,7 @@ end sub
 
 sub fechaConexao
 	'Fechando a conexão com o BD
-	conn.Close()
+
 	Set conn = Nothing
 end sub
 %>
